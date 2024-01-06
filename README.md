@@ -1,0 +1,2 @@
+# PyTerminalNetease
+基于Python实现的网易云音乐命令行包装
