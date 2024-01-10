@@ -12,7 +12,7 @@ class Login:
 
         self.local_data = Account()
         self.local_info = self.local_data.get_stg_accounts
-        print(self.local_info)
+        #print(self.local_info)
 
     @property
     def get_login_status(self):

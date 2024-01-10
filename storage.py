@@ -34,7 +34,7 @@ class Account:
         with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'r', encoding = 'utf-8') as yml_f:
             ymls = yml_f.read()
             self.acc_dict = yaml.load(ymls, Loader=yaml.Loader)
-        print(self.acc_dict)
+        #print(self.acc_dict)
 
     @property
     def get_stg_accounts(self):
@@ -61,7 +61,7 @@ class Account:
                 }
     
         self.acc_dict.append(account_data)
-        print(self.acc_dict)
+        #print(self.acc_dict)
 
         with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'w') as yml_o:
             yaml.dump(self.acc_dict, yml_o)
@@ -159,4 +159,4 @@ class UpdateDownload():
             if tracks['id'] is track_id:
                 tracks.update(download = True)
 
-    
+

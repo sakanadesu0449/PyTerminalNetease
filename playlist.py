@@ -15,32 +15,58 @@ class UserPlaylist:
         self.playlists_info = []
         usr_playlist = apis.user.GetUserPlaylists(self.user_id)
 
-        for playlist_ser in range(0,len(usr_playlist["playlist"])):
-            self.playlists_info.append(
-                {
-                    'name' : usr_playlist["playlist"][playlist_ser]["name"],
-                    'playlist_id' : usr_playlist["playlist"][playlist_ser]["id"],
-                    'count' : usr_playlist["playlist"][playlist_ser]["trackCount"],
-                    'creator' : usr_playlist["playlist"][playlist_ser]["creator"]["nickname"]
-                    }
-                )
+        for playlist in usr_playlist["playlist"]:
+            self.playlists_info.append({
+                'name' : playlist["name"],
+                'playlist_id' : playlist['id'],
+                'count' : playlist["trackCount"],
+                'creator' : playlist["creator"]["nickname"]
+                }
+            )
                 
 
 
 class Playlist:
     def __init__(self, playlist_id):
-        '''                                                                         storage_format = [                                                              {
+        '''                                                                         storage_format = [{
                 'id' : int
                 'download' : bool                                                           'data' : {
-                    'name' : str                                                                'artist' : str                                                              'coverUrl' : str                                                            'lrcs' : str
-                    'album' : str                                                               'br' : {
-                        'standard' : int                                                            'higher' : int
-                        'exhigh' : int                                                              'lossless' : int
-                        'hires' : int                                                               }                                                                       }
+                    'name' : str                                                                'artist' : str                                                              'coverUrl' : str
+                    'album' : str                                                               'br' : int                                             
                 }
-            ]
+            }
+        ]
         '''
         self.playlist_id = playlist_id
+        self.hr_order = ['hr', 'sq', 'l', 'm', 'h']
+        self.ex_playlist = []
+
+    def get_hier_br(self, track):
+        for hr in self.hr_order:
+            if track[hr] is not None:
+                return hr
+
+    def get_all_artists(self, track):
+        all_artist = ''
+        for artists in track['ar']:
+            all_artist += artists['name']
+        return all_artist
+
 
     def get_playlist_detail(self, limits=1000):
-        self.playlist_detail = apis.playlist.GetPlaylistInfo(playlist_id,limit=limits)
+        self.playlist_detail = apis.playlist.GetPlaylistInfo(self.playlist_id, limit=limits)
+
+        for track in self.playlist_detail['playlist']['tracks']:
+            track_details = {
+                    'id' : track['id'],
+                    'download' : False,
+                    'data' : {
+                        'name' : track['name'],
+                        'artist' : self.get_all_artists(track),
+                        'coverUrl' : track['al']['picUrl'],
+                        'album' : track['al']['name'],
+                        'br' : track[self.get_hier_br(track)]['size']
+                        }
+                    }
+            self.ex_playlist.append(track_details)
+
