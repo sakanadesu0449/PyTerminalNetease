@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import os
-import json
+import sys
+import yaml
 
 ENV_SEP = os.sep
 ENV_LINESEP = os.linesep
@@ -7,29 +10,153 @@ DEVICE_NAME = os.name
 
 class Account:
 
-    self.ACC_DATA_PATH = 'user'
-    self.acc_dict = {}
-
     def __init__(self):
+
+        self.ACC_DATA_PATH = 'user'
         
-        self.USER_DATA_FORMAT = {
-                'alias': ''
-                'data': {
-                    'last_method': ''
-                    'account': ''
-                    'password' : ''
-                    }
-                }
+        '''
+        'alias' : {
+            'last_method': ''
+            'account': ''
+            'password' : ''
+            }
+        '''
                 
-        if os.isdir(self.ACC_DATA_PATH) == False:
+                
+        if not os.path.isdir(self.ACC_DATA_PATH):
             os.mkdir(self.ACC_DATA_PATH)
 
-        with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.json', 'r') as json_f:
-            self.acc_dict = json.load(json_f)
+        with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'r+', encoding = 'utf-8') as yml_ini:
+            if not yml_ini.read():
+                print('Initialized.')
+                yaml.dump(['passing'],yml_ini)
 
-    def 
+        with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'r', encoding = 'utf-8') as yml_f:
+            ymls = yml_f.read()
+            self.acc_dict = yaml.load(ymls, Loader=yaml.Loader)
+        print(self.acc_dict)
+
+    @property
+    def get_stg_accounts(self):
+        print(type(self.acc_dict))
+        return self.acc_dict
+
+    @property
+    def has_login_history(self):
+        return True if self.acc_dict else False
+
+
+    def dump(self, alias, account,pwd = None):
+
+        if pwd is None:
+            pwd = None
+
+        #try:
+        account_data = {
+                'alias' : alias,
+                'data' : {
+                    'account' : account,
+                    'password' : pwd,
+                    }
+                }
+    
+        self.acc_dict.append(account_data)
+        print(self.acc_dict)
+
+        with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'w') as yml_o:
+            yaml.dump(self.acc_dict, yml_o)
+
+        #except:
+        #print('fatal error:')
+                
+
+    def del_account(self, alias):
+        pass
+
+
+class Playlist:
+
+    def __init__(self):
+        self.PLAYLIST_DATA_PATH = f'user{ENV_SEP}playlists'
+        '''
+        storage_format = [
+            {
+                'id' : int
+                'download' : bool
+                'data' : {
+                    'name' : str
+                    'artist' : str
+                    'coverUrl' : str
+                    'lrcs' : str
+                    'album' : str
+                    'br' : {
+                        'standard' : int
+                        'higher' : int
+                        'exhigh' : int
+                        'lossless' : int
+                        'hires' : int
+                        }
+                    }
+                }
+            ]
+        '''    
+    @property
+    def get_local_playlists(self):
+        return os.listdir(self.PLAYLIST_DATA_PATH)
+
+
+    def get_playlist_detail(self, playlist_id):
+        if f'{playlist_id}.yml' not in self.get_local_playlists:
+            raise ValueError(f'playlist {playlist_id} not exist.')
+        with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{playlist_id}.yml', 'r', encoding='utf-8') as playlist_f:
+            playlist_data = yaml.load(playlist_f, Loader=yaml.Loader)
+        return playlist_data
+
+    def init_playlist_detail(self, playlist_id):
+        self.playlist_detail = self.get_playlist_detail(playlist_id)
+
+    def init_playlist_ids_dict(self, playlist_id):
+        playlist_d = self.get_playlist_detail(playlist_id)
+        self.playlist_id_dict = {track['id'] : track for track in playlist_d}
+
+    def update_playlist(self, playlist_id, new_data):
+        if f'{playlist_id}.yml' not in self.get_local_playlists:
+            with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{playlist_id}.yml', 'w') as new_f:
+                yaml.dump(new_data, new_f)
+            return None
+
+        self.init_playlist_detail(playlist_id)
+        self.init_playlist_ids_dict(playlist_id)
+        id_dict = self.playlist_id_dict
+
+        for tracks in new_data:
+            if tracks['id'] not in id_dict:
+                self.playlist_detail.append(tracks)
+        with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{playlist_id}.yml', 'w') as update_f:
+            yaml.dump(self.playlist_detail, update_f)
 
 
 
+class UpdateDownload():
 
+    def __init__(self, playlist_id):
+        self.playlist_id = playlist_id
 
+    def __enter__(self):
+        ids_o = Playlist()
+        ids_o.init_playlist_detail()
+        self.playlist_info = ids.playlist_detail
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{self.playlist_id}.yml', 'w')as update_f:
+            yaml.dump(self.playlist_info, update_f)
+
+    def updete_download_stst(self, track_id):
+
+        for tracks in self.playlist_info:
+            if tracks['id'] is track_id:
+                tracks.update(download = True)
+
+    
