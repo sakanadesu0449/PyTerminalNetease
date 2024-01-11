@@ -47,10 +47,10 @@ class Playlist:
                 return hr
 
     def get_all_artists(self, track):
-        all_artist = ''
+        all_artist_list = []
         for artists in track['ar']:
-            all_artist += artists['name']
-        return all_artist
+            all_artist_list.append(artists['name'])
+        return ','.join(all_artist_list)
 
 
     def get_playlist_detail(self, limits=1000):
