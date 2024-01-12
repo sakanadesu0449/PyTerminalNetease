@@ -1,4 +1,4 @@
-from storage import Playlist,UpdateDownload
+import storage
 from pyncm import apis
 
 
@@ -28,17 +28,9 @@ class UserPlaylist:
 
 class Playlist:
     def __init__(self, playlist_id):
-        '''                                                                         storage_format = [{
-                'id' : int
-                'download' : bool                                                           'data' : {
-                    'name' : str                                                                'artist' : str                                                              'coverUrl' : str
-                    'album' : str                                                               'br' : int                                             
-                }
-            }
-        ]
-        '''
+        self.local_playlist = storage.Playlist()
         self.playlist_id = playlist_id
-        self.hr_order = ['hr', 'sq', 'l', 'm', 'h']
+        self.hr_order = ['hr', 'sq', 'h', 'm', 'l']
         self.ex_playlist = []
 
     def get_hier_br(self, track):
@@ -69,4 +61,19 @@ class Playlist:
                         }
                     }
             self.ex_playlist.append(track_details)
+        self.local_playlist.update_playlist(self.playlist_id, self.ex_playlist)
+
+    def start(self):
+        self.get_playlist_detail()
+        d_st = lambda x : '√' if x else 'x'
+        local_playlist = self.local_playlist.get_playlist_detail(self.playlist_id)
+        for track in local_playlist:
+            print('{0}   {1} {2:.1f}m {3}'.format(
+                track['data']['name'],
+                track['data']['artist'],
+                (track['data']['br']/1000000),
+                d_st(track['download'])
+                )
+            )
+
 
