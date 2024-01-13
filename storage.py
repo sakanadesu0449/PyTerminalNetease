@@ -25,7 +25,8 @@ class Account:
                 
         if not os.path.isdir(self.ACC_DATA_PATH):
             os.mkdir(self.ACC_DATA_PATH)
-
+        
+        #本地列表是否为空
         with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'r+', encoding = 'utf-8') as yml_ini:
             if not yml_ini.read():
                 print('Initialized.')
@@ -34,7 +35,7 @@ class Account:
         with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'r', encoding = 'utf-8') as yml_f:
             ymls = yml_f.read()
             self.acc_dict = yaml.load(ymls, Loader=yaml.Loader)
-        #print(self.acc_dict)
+        
 
     @property
     def get_stg_accounts(self):
@@ -49,9 +50,10 @@ class Account:
     def dump(self, alias, account,pwd = None):
 
         if pwd is None:
+            #防止密码为空时获取上次的密码
             pwd = None
 
-        #try:
+        
         account_data = {
                 'alias' : alias,
                 'data' : {
@@ -61,13 +63,10 @@ class Account:
                 }
     
         self.acc_dict.append(account_data)
-        #print(self.acc_dict)
+    
 
         with open(f'{self.ACC_DATA_PATH}{ENV_SEP}user_data.yml', 'w') as yml_o:
             yaml.dump(self.acc_dict, yml_o)
-
-        #except:
-        #print('fatal error:')
                 
 
     def del_account(self, alias):
@@ -123,6 +122,7 @@ class Playlist:
 
     def update_playlist(self, playlist_id, new_data):
         if f'{playlist_id}.yml' not in self.get_local_playlists:
+            #若该播放列表未本地化
             with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{playlist_id}.yml', 'w') as new_f:
                 yaml.dump(new_data, new_f)
             return None
@@ -133,6 +133,7 @@ class Playlist:
 
         for tracks in new_data:
             if tracks['id'] not in id_dict:
+                #以id为唯一标识符检测剔除重复歌曲
                 self.playlist_detail.append(tracks)
         with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{playlist_id}.yml', 'w') as update_f:
             yaml.dump(self.playlist_detail, update_f)
@@ -146,6 +147,7 @@ class UpdateDownload():
         self.playlist_id = playlist_id
 
     def __enter__(self):
+        #上下文管理器自动保存更新项
         ids_o = Playlist()
         ids_o.init_playlist_detail(self.playlist_id)
         self.playlist_info = ids_o.get_playlist_detail(self.playlist_id)
@@ -153,6 +155,7 @@ class UpdateDownload():
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        #以任何方式退出该上下文管理器都会执行保存，防止漏项
         with open(f'{self.PLAYLIST_PATH}{self.playlist_id}.yml', 'w')as update_f:
             yaml.dump(self.playlist_info, update_f)
         print('updated!')
@@ -160,6 +163,7 @@ class UpdateDownload():
     def update_download_stat(self, track_id):
 
         for track_c in range(0,len(self.playlist_info)):
+            #遍历曲目id
             if self.playlist_info[track_c]['id'] == track_id:
                 self.playlist_info[track_c]['download'] = True
 

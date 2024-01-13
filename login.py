@@ -12,7 +12,7 @@ class Login:
 
         self.local_data = Account()
         self.local_info = self.local_data.get_stg_accounts
-        #print(self.local_info)
+        
 
     @property
     def get_login_status(self):
@@ -24,7 +24,6 @@ class Login:
             ]
 
     def save_account_data(self,alias,account,pwd = None):
-        
         self.local_data.dump(alias,account,pwd)
 
     def get_new_account(self):
@@ -39,16 +38,19 @@ class Login:
     def account_login(self,acc_info):
         alias,account,pwd = acc_info
         if not pwd:
+            #是否验证码
             apis.login.SetSendRegisterVerifcationCodeViaCellphone(account)
             captcha = input('input your Captcha:')
             apis.login.LoginViaCellphone(account,captcha = captcha)
             return self.get_login_status
 
         elif '@' in account:
+            #是否为邮箱
             apis.login.LoginViaEmail(account,pwd)
             return self.get_login_status
 
         else:
+            #都不是，手机密码登录
             apis.login.LoginViaCellphone(account,pwd)
             return self.get_login_status
 
@@ -58,6 +60,7 @@ class Login:
             '0' to use a new account
             '1' to continue{SEP}''')
         if (not self.local_data.has_login_history) or (int(use_account) == 0):
+            #若用户输入0或本地列表为空
             new_account_info = self.get_new_account()
             self.account_login(new_account_info)
 

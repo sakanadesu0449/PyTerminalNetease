@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import storage
 from pyncm import apis
 from download import Download
@@ -30,15 +32,17 @@ class Playlist:
     def __init__(self, playlist_id):
         self.local_playlist = storage.Playlist()
         self.playlist_id = playlist_id
-        self.hr_order = ['hr', 'sq', 'h', 'm', 'l']
+        self.hr_order = ['hr', 'sq', 'h', 'm', 'l'] #音质级别从高到底保证获取最高音质
         self.ex_playlist = []
 
     def get_hier_br(self, track):
+        #获取最高音质
         for hr in self.hr_order:
             if track[hr] is not None:
                 return hr
 
     def get_all_artists(self, track):
+        #拼接多个艺术家名称，以逗号链接
         all_artist_list = []
         for artists in track['ar']:
             all_artist_list.append(artists['name'])
@@ -49,6 +53,7 @@ class Playlist:
         self.playlist_detail = apis.playlist.GetPlaylistInfo(self.playlist_id, limit=limits)
 
         for track in self.playlist_detail['playlist']['tracks']:
+            #构造单曲数据
             track_details = {
                     'id' : track['id'],
                     'download' : False,

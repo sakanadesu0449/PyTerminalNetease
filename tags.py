@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from mutagen.flac import FLAC, Picture
 from mutagen.mp3 import EasyMP3
 from mutagen.id3 import ID3, APIC
