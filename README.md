@@ -5,7 +5,7 @@
 + Python 3.7+
 
 > 需要以下第三方模块：
-> + pyncm
+> + pyncm [https://github.com/mos9527/pyncm]
 > + mutagen
 > + yaml  
 
