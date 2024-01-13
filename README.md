@@ -1,5 +1,6 @@
 # PyTerminalNetease
-#基于Python实现的网易云音乐歌单批量下载器
+## 基于Python实现的网易云音乐歌单批量下载器
+实现批量下载和自动添加曲目ID3tags，歌单下载数据本地化
 
 + Python 3.7+
 
