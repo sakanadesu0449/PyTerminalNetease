@@ -7,6 +7,7 @@
 > 需要以下第三方模块：
 > + pyncm [https://github.com/mos9527/pyncm]
 > + mutagen
+> + wget
 > + yaml  
 
 > 使用方法：
