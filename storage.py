@@ -78,6 +78,8 @@ class Playlist:
 
     def __init__(self):
         self.PLAYLIST_DATA_PATH = f'user{ENV_SEP}playlists'
+        if not os.path.isdir(self.PLAYLIST_DATA_PATH):
+            os.mkdir(self.PLAYLIST_DATA_PATH)
         '''
         storage_format = [
             {
@@ -140,23 +142,25 @@ class Playlist:
 class UpdateDownload():
 
     def __init__(self, playlist_id):
+        self.PLAYLIST_PATH = f'user{ENV_SEP}playlists{ENV_SEP}'
         self.playlist_id = playlist_id
 
     def __enter__(self):
         ids_o = Playlist()
-        ids_o.init_playlist_detail()
-        self.playlist_info = ids.playlist_detail
+        ids_o.init_playlist_detail(self.playlist_id)
+        self.playlist_info = ids_o.get_playlist_detail(self.playlist_id)
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        with open(f'{self.PLAYLIST_DATA_PATH}{ENV_SEP}{self.playlist_id}.yml', 'w')as update_f:
+        with open(f'{self.PLAYLIST_PATH}{self.playlist_id}.yml', 'w')as update_f:
             yaml.dump(self.playlist_info, update_f)
+        print('updated!')
 
-    def updete_download_stst(self, track_id):
+    def update_download_stat(self, track_id):
 
-        for tracks in self.playlist_info:
-            if tracks['id'] is track_id:
-                tracks.update(download = True)
+        for track_c in range(0,len(self.playlist_info)):
+            if self.playlist_info[track_c]['id'] == track_id:
+                self.playlist_info[track_c]['download'] = True
 
 

@@ -1,6 +1,6 @@
 import storage
 from pyncm import apis
-
+from download import Download
 
 class UserPlaylist:
     def __init__(self, user_id=0):
@@ -75,5 +75,8 @@ class Playlist:
                 d_st(track['download'])
                 )
             )
+        if input('download this playlist?[y/n]') == 'y':
+            download = Download()
+            download.download_playlist(self.playlist_id, local_playlist)
 
 
